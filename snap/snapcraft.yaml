@@ -46,7 +46,7 @@ apps:
     environment: &environment
       DISABLE_WAYLAND: 1
   outlook:
-    command: webapp-office-x365.launcher "https://outlook.office.com/calendar/view/week#authRedirect=true" "Outlook"
+    command: webapp-office-x365.launcher "https://outlook.office.com" "Outlook"
     desktop: snap/gui/outlook.desktop
     plugs: *plugs
     environment: *environment
