@@ -18,10 +18,10 @@ Office 365, OneNote, OneDrive, Outlook, Excel, PowerPoint, and Microsoft are tra
 ## Download
 
 ```
-snap install unofficial-webapp-office
+snap install webapp-office-x365
 ```
 
-[![Snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/unofficial-webapp-office)
+[![Snap](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/webapp-office-x365)
 
 ## Notes
 
@@ -33,7 +33,7 @@ Check "Keep me signed in" to avoid having to sign into each web app individually
 
 ## How This Works
 
-[unofficial-webapp-office.launcher](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/unofficial-webapp-office.launcher) is just a shell script:
+[webapp-office-x365.launcher](https://github.com/sirredbeard/webapp-office-x365/blob/master/webapp-office-x365.launcher) is just a shell script:
 
 ```
 #!/bin/sh
@@ -43,12 +43,12 @@ Check "Keep me signed in" to avoid having to sign into each web app individually
 export OXIDE_NO_SANDBOX=1
 
 # Explicitly set APP_ID.
-export APP_ID=unofficial-webapp-office
+export APP_ID=webapp-office-x365
 
 # Remove problematic environment variable
 unset QT_QPA_PLATFORM
 
-exec "$SNAP/bin/desktop-launch" "qmlscene" "$1" "$2" "$SNAP/unofficial-webapp-office.qml" --scaling
+exec "$SNAP/bin/desktop-launch" "qmlscene" "$1" "$2" "$SNAP/webapp-office-x365.qml" --scaling
 
 ```
 
@@ -56,7 +56,7 @@ The shell script sets some variables and then calls a desktop launcher binary ap
 
 Note that the launcher shell script will run inside our container, so the paths it uses is set relative to the snap using $SNAP and will be interpreted on the fly when the snapped application is run.
 
-A similar GUI helper kit exists for [GTK-based apps](https://github.com/ubuntu/snapcraft-desktop-helpers/tree/master/gtk). Here is the relevant YAML in the [Snapcraft file](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/snap/snapcraft.yaml) where the helper kit is installed into the snap:
+A similar GUI helper kit exists for [GTK-based apps](https://github.com/ubuntu/snapcraft-desktop-helpers/tree/master/gtk). Here is the relevant YAML in the [Snapcraft file](https://github.com/sirredbeard/webapp-office-x365/blob/master/snap/snapcraft.yaml) where the helper kit is installed into the snap:
 
 ```
 parts:
@@ -71,11 +71,11 @@ The helper kit is built directly from the upstream GitHub repository using the [
 
 Back in our original shell script desktop-launch is used to call [qmlscene](https://doc.qt.io/qt-5/qtquick-qmlscene.html). qmlscene is part of the [Qt UI development toolkit](https://www.qt.io/):
 
-`exec "$SNAP/bin/desktop-launch" "qmlscene" "$1" "$2" "$SNAP/unofficial-webapp-office.qml" --scaling`
+`exec "$SNAP/bin/desktop-launch" "qmlscene" "$1" "$2" "$SNAP/webapp-office-x365.qml" --scaling`
 
 qmlscene is used to run mock-ups of QML files, the Qt markup language. There is no separate C++ (or Python) code here you would normally expect to see with a full-fledged Qt application. The logic of the app is embedded in [JavaScript embedded in the QML](https://doc.qt.io/qt-5/qtqml-javascript-expressions.html) and how Snapcraft itself simply works. qmlscene is called with --scaling to enable scaling on HiDPI displays.
 
-The shell script tells qmlscene to parse QML file [unofficial-webapp-office.qml](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/unofficial-webapp-office.qml). The QML draws a basic window, embeds a WebKit engine in it (these Qt dependencies are fulfilled by the staged packages in our [Snapcraft file](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/snap/snapcraft.yaml)), handles two command-line variables passed to it: the name of the website and it's URL:
+The shell script tells qmlscene to parse QML file [webapp-office-x365.qml](https://github.com/sirredbeard/webapp-office-x365/blob/master/webapp-office-x365.qml). The QML draws a basic window, embeds a WebKit engine in it (these Qt dependencies are fulfilled by the staged packages in our [Snapcraft file](https://github.com/sirredbeard/webapp-office-x365/blob/master/snap/snapcraft.yaml)), handles two command-line variables passed to it: the name of the website and it's URL:
 
 ```
 Window {
@@ -109,10 +109,10 @@ Some JavaScript (currently a bit cumbersome) determines whether to open clicked 
 
 The creation of the individual web apps is then handled by Snapcraft itself when the snap is built. For each web app an app is declared in the snap with a corresponding .desktop file (which itself has a corresponding icon) and app, specific command-line arguments, for example `OneDrive` and `https://onedrive.live.com/`.
 
-Taking a look [in our Snapcaft file](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/snap/snapcraft.yaml), after the Qt GUI desktop helper kit is installed, the contents of our GitHub repo are then dumped into the snap build environment by use of the [dump plugin](https://snapcraft.io/docs/dump-plugin) and necessary Qt dependencies installed by their Debian package names using [stage-packages](https://snapcraft.io/docs/build-and-staging-dependencies):
+Taking a look [in our Snapcaft file](https://github.com/sirredbeard/webapp-office-x365/blob/master/snap/snapcraft.yaml), after the Qt GUI desktop helper kit is installed, the contents of our GitHub repo are then dumped into the snap build environment by use of the [dump plugin](https://snapcraft.io/docs/dump-plugin) and necessary Qt dependencies installed by their Debian package names using [stage-packages](https://snapcraft.io/docs/build-and-staging-dependencies):
 
 ```
-  unofficial-webapp-office-qml:
+  webapp-office-x365-qml:
     after: [desktop-qt5]
     source: .
     plugin: dump
@@ -123,17 +123,17 @@ Taking a look [in our Snapcaft file](https://github.com/sirredbeard/unofficial-w
       - qml-module-qtwebengine
       - qml-module-qtquick-dialogs
     organize:
-      unofficial-webapp-office.launcher: bin/unofficial-webapp-office.launcher
+      webapp-office-x365.launcher: bin/webapp-office-x365.launcher
 ```
 
-[Organize](https://snapcraft.io/docs/snapcraft-parts-metadata) moves our binary into place and is a lot cleaner than a lot of `mkdir` and `mv`. The [gui folder](https://github.com/sirredbeard/unofficial-webapp-office/tree/master/snap/gui) with its .desktop files and .png icon files will make its way over by virtue of being in the snap folder. Notice how only things declared, moved, or in specific places make it into the snap with our app.
+[Organize](https://snapcraft.io/docs/snapcraft-parts-metadata) moves our binary into place and is a lot cleaner than a lot of `mkdir` and `mv`. The [gui folder](https://github.com/sirredbeard/webapp-office-x365/tree/master/snap/gui) with its .desktop files and .png icon files will make its way over by virtue of being in the snap folder. Notice how only things declared, moved, or in specific places make it into the snap with our app.
 
 We then 'create' our individual apps for each of the web apps:
 
 ```
 apps:
   word:
-    command: unofficial-webapp-office.launcher "https://www.office.com/launch/word" "Word"
+    command: webapp-office-x365.launcher "https://www.office.com/launch/word" "Word"
     desktop: snap/gui/word.desktop
     plugs: &plugs
       - browser-support
@@ -154,15 +154,15 @@ Thankfully creating the rest of the apps is not as complicated, we can just * th
 
 ```
   outlook:
-    command: unofficial-webapp-office.launcher "https://outlook.live.com/mail/0/inbox" "Outlook"
+    command: webapp-office-x365.launcher "https://outlook.live.com/mail/0/inbox" "Outlook"
     desktop: snap/gui/outlook.desktop
     plugs: *plugs
     environment: *environment
 ```
 
-Snapcraft creates our individual apps, all calling [unofficial-webapp-office.launcher](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/unofficial-webapp-office.launcher) with the relevant app name and URL as command line arguments, which then calls qmlscene and renders [unoffocial-webapp-office.qml](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/unofficial-webapp-office.qml) giving us a minimalist web browser with our app name as the window title and URL rendered. Some simple JavaScript in the QML handles how to handle opening new Microsoft links in a new window or other links in the external default OS browser. By referencing the respective .desktop file in our [Snapcraft file](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/snap/snapcraft.yaml) and then the respective .png icon file in our [.desktop file](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/snap/gui/excel.desktop) the desktop environment icon creation is handled for us.
+Snapcraft creates our individual apps, all calling [webapp-office-x365.launcher](https://github.com/sirredbeard/webapp-office-x365/blob/master/webapp-office-x365.launcher) with the relevant app name and URL as command line arguments, which then calls qmlscene and renders [unoffocial-webapp-office.qml](https://github.com/sirredbeard/webapp-office-x365/blob/master/webapp-office-x365.qml) giving us a minimalist web browser with our app name as the window title and URL rendered. Some simple JavaScript in the QML handles how to handle opening new Microsoft links in a new window or other links in the external default OS browser. By referencing the respective .desktop file in our [Snapcraft file](https://github.com/sirredbeard/webapp-office-x365/blob/master/snap/snapcraft.yaml) and then the respective .png icon file in our [.desktop file](https://github.com/sirredbeard/webapp-office-x365/blob/master/snap/gui/excel.desktop) the desktop environment icon creation is handled for us.
 
-The snap is built directly on GitHub using GitHub actions, defined [also in YAML](https://github.com/sirredbeard/unofficial-webapp-office/blob/master/.github/workflows/snapcraft.yml).
+The snap is built directly on GitHub using GitHub actions, defined [also in YAML](https://github.com/sirredbeard/webapp-office-x365/blob/master/.github/workflows/snapcraft.yml).
 
 The heading defines the workflow name, when the workflow will run (on a push to the repo), and set up our jobs. The primary job is called stable in anticipation of having future release levels, such as edge or beta, depending on the complexity of the app. We will run the action on an Ubuntu 18.04 VM. However, the default Ubuntu 18.04 image on GitHub Actions does not have the various mountpoints and loopback devices needed for Multipass, the hypervisor that powers the snap build, by default. We can get them though by jumping into a Docker container specifically designed for building snaps from the Snapcraft team:
 
@@ -213,7 +213,7 @@ snapcraft export-login snapcraft.login
 base64 snapcraft.login | xsel --clipboard
 ```
 
-You will also need to reserve a different name from unofficial-webapp-office in the Snapcraft file.
+You will also need to reserve a different name from webapp-office-x365 in the Snapcraft file.
 
 We import the base64 string secret as an environmental variable consumable in shell script just like any other environment variable. This is done in the env section of the related job. We then echo that environmental variable back through base64 and save it as a new snapcraft config file in our VM containing our key before pushing to the Store. Snapcraft grabs the key and pushes our snap directly to the Snapcraft Store.
 
@@ -232,8 +232,8 @@ We import the base64 string secret as an environmental variable consumable in sh
 
 ### Build Status
 
-![Status](https://github.com/sirredbeard/unofficial-webapp-office/workflows/snapcraft/badge.svg)
+![Status](https://github.com/sirredbeard/webapp-office-x365/workflows/snapcraft/badge.svg)
 
 ### Snapcraft Store Status
 
-[![Snapcraft](https://snapcraft.io/unofficial-webapp-office/badge.svg)](https://snapcraft.io/unofficial-webapp-office)
+[![Snapcraft](https://snapcraft.io/webapp-office-x365/badge.svg)](https://snapcraft.io/webapp-office-x365)
